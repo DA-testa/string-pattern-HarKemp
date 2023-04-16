@@ -1,32 +1,66 @@
 # python3
 
 def read_input():
-    # this function needs to aquire input both from keyboard and file
-    # as before, use capital i (input from keyboard) and capital f (input from file) to choose which input type will follow
-    
-    
-    # after input type choice
-    # read two lines 
-    # first line is pattern 
-    # second line is text in which to look for pattern 
-    
-    # return both lines in one return
-    
-    # this is the sample return, notice the rstrip function
-    return (input().rstrip(), input().rstrip())
+    inputType = input()
+
+    if "I" in inputType:
+        pattern = input()
+        text = input()
+    # input from a file
+    elif "F" in inputType:
+        try:
+            with open("tests/06") as f:
+                pattern = f.readline().strip()
+                text = f.readline().strip()
+        except FileNotFoundError:
+            print("file not found")
+            return
+    else:
+        print("Invalid input source")
+        return
+
+    return (pattern.rstrip(), text.rstrip())
+
+
+B = 13
+Q = 256
+
+
+def get_hash(pattern: str) -> int:
+    global B, Q
+    m = len(pattern)
+    result = 0
+    for i in range(m):
+        result = (B * result + ord(pattern[i])) % Q
+    return result
+
 
 def print_occurrences(output):
-    # this function should control output, it doesn't need any return
     print(' '.join(map(str, output)))
 
+
 def get_occurrences(pattern, text):
-    # this function should find the occurances using Rabin Karp alghoritm 
+    global B, Q
+    pattern_length = len(pattern)
+    text_length = len(text)
 
-    # and return an iterable variable
-    return [0]
+    hash_patt = get_hash(pattern)
+    hash_text = get_hash(text[0:pattern_length])
+
+    b_power = pow(B, pattern_length - 1, Q)
+
+    occurrences = []
+
+    for i in range(text_length - pattern_length + 1):
+        if hash_patt == hash_text and text[i:i + pattern_length] == pattern:
+            occurrences.append(i)
+
+        if i < text_length - pattern_length:
+            hash_text = (hash_text - ord(text[i]) * b_power) % Q
+            hash_text = (hash_text * B + ord(text[i + pattern_length])) % Q
+
+    return occurrences
 
 
-# this part launches the functions
 if __name__ == '__main__':
     print_occurrences(get_occurrences(*read_input()))
-
