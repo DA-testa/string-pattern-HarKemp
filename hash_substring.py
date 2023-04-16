@@ -19,7 +19,7 @@ def read_input():
         print("Invalid input source")
         return
 
-    return (pattern, text)
+    return (pattern.rstrip(), text.rstrip())
 
 
 B = 13
